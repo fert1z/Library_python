@@ -33,13 +33,20 @@ class Library:
         """Ищет книгу по идентификатору."""
         return self.books.get(book_id)
 
-    def add_user(self, user: User) -> None:
-        """Заглушка для добавления пользователя."""
-        raise NotImplementedError
+    def add_user(self, name: str) -> User:
+        """Создаёт пользователя и добавляет в каталог."""
+        user_id = uuid4().hex
+        user = User(name=name, user_id=user_id)
+        self.users[user_id] = user
+        return user
+
+    def remove_user(self, user_id: str) -> bool:
+        """Удаляет пользователя по идентификатору."""
+        return self.users.pop(user_id, None) is not None
 
     def find_user(self, user_id: str) -> Optional[User]:
-        """Заглушка для поиска пользователя по идентификатору."""
-        raise NotImplementedError
+        """Ищет пользователя по идентификатору."""
+        return self.users.get(user_id)
 
     def borrow_book(
         self,
