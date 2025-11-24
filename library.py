@@ -32,3 +32,29 @@ class Library:
         """Заглушка для поиска пользователя по идентификатору."""
         raise NotImplementedError
 
+    def return_book(self, user_id: str, book_id: str) -> bool:
+        """Возвращает книгу: обновляет выдачу, книгу и пользователя."""
+        user = self.users.get(user_id)
+        if not user:
+            raise ValueError(f"Пользователь {user_id} не найден")
+
+        book = self.books.get(book_id)
+        if not book:
+            raise ValueError(f"Книга {book_id} не найдена")
+
+        loan_index = next(
+            (idx for idx, loan in enumerate(self.loans) if loan.book_id == book_id and loan.user_id == user_id),
+            None,
+        )
+        if loan_index is None:
+            raise ValueError("Запись о выдаче не найдена")
+
+        self.loans.pop(loan_index)
+        book.is_available = True
+        book.reserved_by = None
+
+        if book_id in user.borrowed_books:
+            user.borrowed_books.remove(book_id)
+
+        return True
+
