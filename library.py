@@ -32,3 +32,21 @@ class Library:
         """Заглушка для поиска пользователя по идентификатору."""
         raise NotImplementedError
 
+    def reserve_book(self, user_id: str, book_id: str) -> None:
+        """Бронирует недоступную книгу для пользователя."""
+        user = self.users.get(user_id)
+        if not user:
+            raise ValueError(f"Пользователь {user_id} не найден")
+
+        book = self.books.get(book_id)
+        if not book:
+            raise ValueError(f"Книга {book_id} не найдена")
+
+        if book.is_available:
+            raise ValueError("Нельзя бронировать доступную книгу")
+
+        if book.reserved_by and book.reserved_by != user_id:
+            raise ValueError("Книга уже забронирована другим пользователем")
+
+        book.reserved_by = user_id
+
