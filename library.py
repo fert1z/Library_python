@@ -122,3 +122,24 @@ class Library:
             )
         return result
 
+    def get_all_books_report(self) -> List[Dict[str, str]]:
+        """Возвращает краткий отчёт по всем книгам."""
+        report: List[Dict[str, str]] = []
+        for book_id, book in self.books.items():
+            if book.reserved_by:
+                status = f"Reserved by {book.reserved_by}"
+            elif book.is_available:
+                status = "Available"
+            else:
+                status = "Borrowed"
+
+            report.append(
+                {
+                    "id": book_id,
+                    "title": book.title,
+                    "author": book.author,
+                    "status": status,
+                }
+            )
+        return report
+
