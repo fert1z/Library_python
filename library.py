@@ -1,8 +1,7 @@
 """Модуль с моделью библиотеки."""
 
-from datetime import date, timedelta
+from datetime import date
 from typing import Dict, List, Optional
-from uuid import uuid4
 
 from book import Book
 from loan import Loan
@@ -18,96 +17,21 @@ class Library:
         self.users: Dict[str, User] = {}
         self.loans: List[Loan] = []
 
-    def add_book(self, title: str, author: str) -> Book:
-        """Создаёт книгу и добавляет в каталог."""
-        book_id = uuid4().hex
-        book = Book(title=title, author=author, book_id=book_id)
-        self.books[book_id] = book
-        return book
+    def add_book(self, book: Book) -> None:
+        """Заглушка для добавления книги."""
+        raise NotImplementedError
 
-    def remove_book(self, book_id: str) -> bool:
-        """Удаляет книгу по идентификатору и возвращает True, если она существовала."""
-        return self.books.pop(book_id, None) is not None
+    def add_user(self, user: User) -> None:
+        """Заглушка для добавления пользователя."""
+        raise NotImplementedError
 
     def find_book(self, book_id: str) -> Optional[Book]:
-        """Ищет книгу по идентификатору."""
-        return self.books.get(book_id)
-
-    def add_user(self, name: str) -> User:
-        """Создаёт пользователя и добавляет в каталог."""
-        user_id = uuid4().hex
-        user = User(name=name, user_id=user_id)
-        self.users[user_id] = user
-        return user
-
-    def remove_user(self, user_id: str) -> bool:
-        """Удаляет пользователя по идентификатору."""
-        return self.users.pop(user_id, None) is not None
+        """Заглушка для поиска книги по идентификатору."""
+        raise NotImplementedError
 
     def find_user(self, user_id: str) -> Optional[User]:
-        """Ищет пользователя по идентификатору."""
-        return self.users.get(user_id)
-
-    def borrow_book(
-        self,
-        user_id: str,
-        book_id: str,
-        loan_period_days: int = 14,
-        borrow_date: Optional[date] = None,
-    ) -> Loan:
-        """Выдаёт книгу пользователю при соблюдении всех условий."""
-        user = self.users.get(user_id)
-        if not user:
-            raise ValueError(f"Пользователь {user_id} не найден")
-
-        book = self.books.get(book_id)
-        if not book:
-            raise ValueError(f"Книга {book_id} не найдена")
-
-        if not book.is_available:
-            raise ValueError(f"Книга {book_id} уже выдана")
-
-        borrow_date = borrow_date or date.today()
-        due_date = borrow_date + timedelta(days=loan_period_days)
-
-        book.is_available = False
-        book.reserved_by = user.name
-        user.borrowed_books.append(book_id)
-
-        loan = Loan(
-            book_id=book_id,
-            user_id=user_id,
-            borrow_date=borrow_date,
-            due_date=due_date,
-        )
-        self.loans.append(loan)
-        return loan
-
-    def return_book(self, user_id: str, book_id: str) -> bool:
-        """Возвращает книгу: обновляет выдачу, книгу и пользователя."""
-        user = self.users.get(user_id)
-        if not user:
-            raise ValueError(f"Пользователь {user_id} не найден")
-
-        book = self.books.get(book_id)
-        if not book:
-            raise ValueError(f"Книга {book_id} не найдена")
-
-        loan_index = next(
-            (idx for idx, loan in enumerate(self.loans) if loan.book_id == book_id and loan.user_id == user_id),
-            None,
-        )
-        if loan_index is None:
-            raise ValueError("Запись о выдаче не найдена")
-
-        self.loans.pop(loan_index)
-        book.is_available = True
-        book.reserved_by = None
-
-        if book_id in user.borrowed_books:
-            user.borrowed_books.remove(book_id)
-
-        return True
+        """Заглушка для поиска пользователя по идентификатору."""
+        raise NotImplementedError
 
     def get_users_and_their_books(self) -> List[Dict[str, List[str]]]:
         """Возвращает сведения о пользователях и их книгах."""
@@ -122,42 +46,27 @@ class Library:
             )
         return result
 
-    def get_all_books_report(self) -> List[Dict[str, str]]:
-        """Возвращает краткий отчёт по всем книгам."""
-        report: List[Dict[str, str]] = []
-        for book_id, book in self.books.items():
-            if book.reserved_by:
-                status = f"Reserved by {book.reserved_by}"
-            elif book.is_available:
-                status = "Available"
-            else:
-                status = "Borrowed"
+    def get_overdue_books(self) -> List[Dict[str, str | int]]:
+        """Возвращает информацию о просроченных книгах."""
+        today = date.today()
+        overdue_items: List[Dict[str, str | int]] = []
+        for loan in self.loans:
+            if not loan.is_overdue(today):
+                continue
 
-            report.append(
+            book = self.books.get(loan.book_id)
+            user = self.users.get(loan.user_id)
+            days_overdue = (today - loan.due_date).days
+
+            overdue_items.append(
                 {
-                    "id": book_id,
-                    "title": book.title,
-                    "author": book.author,
-                    "status": status,
+                    "book_id": loan.book_id,
+                    "book_title": book.title if book else "Unknown",
+                    "user_id": loan.user_id,
+                    "user_name": user.name if user else "Unknown",
+                    "days_overdue": days_overdue,
                 }
             )
-        return report
 
-    def reserve_book(self, user_id: str, book_id: str) -> None:
-        """Бронирует недоступную книгу для пользователя."""
-        user = self.users.get(user_id)
-        if not user:
-            raise ValueError(f"Пользователь {user_id} не найден")
-
-        book = self.books.get(book_id)
-        if not book:
-            raise ValueError(f"Книга {book_id} не найдена")
-
-        if book.is_available:
-            raise ValueError("Нельзя бронировать доступную книгу")
-
-        if book.reserved_by and book.reserved_by != user_id:
-            raise ValueError("Книга уже забронирована другим пользователем")
-
-        book.reserved_by = user_id
+        return overdue_items
 
