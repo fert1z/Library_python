@@ -109,3 +109,16 @@ class Library:
 
         return True
 
+    def get_users_and_their_books(self) -> List[Dict[str, List[str]]]:
+        """Возвращает сведения о пользователях и их книгах."""
+        result: List[Dict[str, List[str]]] = []
+        for user in self.users.values():
+            result.append(
+                {
+                    "user_id": user.user_id,
+                    "name": user.name,
+                    "borrowed_books": list(user.borrowed_books),
+                }
+            )
+        return result
+
