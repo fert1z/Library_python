@@ -70,3 +70,17 @@ class Library:
 
         return overdue_items
 
+    def get_top_readers(self) -> List[Dict[str, str | int]]:
+        """Возвращает список самых активных читателей, отсортированных по количеству взятых книг."""
+        readers_data: List[Dict[str, str | int]] = []
+        for user in self.users.values():
+            readers_data.append(
+                {
+                    "user_id": user.user_id,
+                    "name": user.name,
+                    "books_count": len(user.borrowed_books),
+                }
+            )
+        readers_data.sort(key=lambda x: x["books_count"], reverse=True)
+        return readers_data
+
