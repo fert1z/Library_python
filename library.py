@@ -237,3 +237,47 @@ class Library:
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
+    def load_from_file(self, filename: str) -> None:
+        """Загружает состояние библиотеки из JSON-файла."""
+        with open(filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Восстановление имени библиотеки
+        self.name = data.get("name", "My Library")
+
+        # Восстановление книг
+        self.books = {}
+        books_data = data.get("books", {})
+        for book_id, book_info in books_data.items():
+            book = Book(
+                title=book_info["title"],
+                author=book_info["author"],
+                book_id=book_info["book_id"],
+                is_available=book_info["is_available"],
+                reserved_by=book_info.get("reserved_by"),
+            )
+            self.books[book_id] = book
+
+        # Восстановление пользователей
+        self.users = {}
+        users_data = data.get("users", {})
+        for user_id, user_info in users_data.items():
+            user = User(
+                name=user_info["name"],
+                user_id=user_info["user_id"],
+                borrowed_books=user_info.get("borrowed_books", []),
+            )
+            self.users[user_id] = user
+
+        # Восстановление выдач (с преобразованием строк дат в объекты date)
+        self.loans = []
+        loans_data = data.get("loans", [])
+        for loan_info in loans_data:
+            loan = Loan(
+                book_id=loan_info["book_id"],
+                user_id=loan_info["user_id"],
+                borrow_date=date.fromisoformat(loan_info["borrow_date"]),
+                due_date=date.fromisoformat(loan_info["due_date"]),
+            )
+            self.loans.append(loan)
+
