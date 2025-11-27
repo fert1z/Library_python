@@ -1,5 +1,6 @@
 """Модуль с моделью библиотеки."""
 
+import json
 from datetime import date, timedelta
 from typing import Dict, List, Optional
 from uuid import uuid4
@@ -191,4 +192,48 @@ class Library:
             )
         readers_data.sort(key=lambda x: x["books_count"], reverse=True)
         return readers_data
+
+    def save_to_file(self, filename: str) -> None:
+        """Сохраняет состояние библиотеки в JSON-файл."""
+        # Сериализация книг
+        books_data = {}
+        for book_id, book in self.books.items():
+            books_data[book_id] = {
+                "title": book.title,
+                "author": book.author,
+                "book_id": book.book_id,
+                "is_available": book.is_available,
+                "reserved_by": book.reserved_by,
+            }
+
+        # Сериализация пользователей
+        users_data = {}
+        for user_id, user in self.users.items():
+            users_data[user_id] = {
+                "name": user.name,
+                "user_id": user.user_id,
+                "borrowed_books": list(user.borrowed_books),
+            }
+
+        # Сериализация выдач (с конвертацией дат в строки)
+        loans_data = []
+        for loan in self.loans:
+            loans_data.append({
+                "book_id": loan.book_id,
+                "user_id": loan.user_id,
+                "borrow_date": loan.borrow_date.isoformat(),
+                "due_date": loan.due_date.isoformat(),
+            })
+
+        # Объединение всех данных
+        data = {
+            "name": self.name,
+            "books": books_data,
+            "users": users_data,
+            "loans": loans_data,
+        }
+
+        # Сохранение в файл
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
