@@ -1,112 +1,108 @@
-# Система управления библиотекой с бронированием и отчётами
+# Library management system with bookings and reports
 
-Объектно-ориентированная система управления библиотекой на Python, предназначенная для управления каталогом книг, пользователями и учётом выдачи книг.
+An object-oriented library management system in Python, designed to manage the catalog of books, users, and accounting for book issuance.
 
-## Описание проекта
+## Project Description
 
-Система позволяет:
-- Управлять каталогом книг (добавление, удаление)
-- Управлять пользователями библиотеки
-- Выдавать и возвращать книги
-- Бронировать недоступные книги
-- Генерировать различные отчёты
-- Сохранять и загружать данные в формате JSON
+The system allows you to:
+- Manage the book catalog (add, delete)
+- Manage library users
+- Give out and return books
+- Book unavailable books
+- Generate various reports
+- Save and upload data in JSON format
 
-## Структура проекта
+## Project structure
 
-```
 library-_-Management-main/
-├── book.py          # Класс Book (книга)
-├── user.py          # Класс User (пользователь)
-├── loan.py          # Класс Loan (выдача книги)
-├── library.py       # Класс Library (библиотека)
-├── main.py          # Главная программа с меню
-├── requirements.txt # Зависимости проекта
-└── README.md        # Документация
-```
+├── book.py # Class Book (book)
+,── user.py # User class
+├── loan.py # Class Loan (book withdrawal)
+├── library.py # Library class
+├── main.py # Main program with menu
+,── requirements.txt # Project dependencies
+,── README.md # Documentation
 
-## Основные классы
+## Main classes
 
 ### Book
-Хранит информацию о книге:
-- Название и автор
-- Статус доступности
-- Список резерваций
+Stores information about the book:
+- Title and author
+- Availability status
+- List of reservations
 
 ### User
-Хранит информацию о пользователе:
-- Имя пользователя
-- Список взятых книг
+Stores user information:
+- User's name
+- A list of borrowed books
 
 ### Loan
-Связывает книгу и пользователя:
-- Имя пользователя и ID книги
-- Дата выдачи и возврата
-- Проверка просрочки
+Connects the book and the user:
+- User name and book ID
+- Date of issue and return
+- Checking the delay
 
 ### Library
-Управляет всей системой:
-- Коллекция книг и пользователей
-- Выдачи книг
-- Генерация отчётов
-- Сохранение/загрузка данных
+Manages the entire system:
+- Collection of books and users
+- Book issuance
+- Report generation
+- Saving/loading data
 
-## Установка и запуск
+## Installation and launch
 
-1. Убедитесь, что у вас установлен Python 3.7 или выше
-2. Клонируйте репозиторий или скачайте файлы
-3. Запустите программу:
+1. Make sure you have Python 3.7 or higher installed.
+2. Clone the repository or download the files
+3. Run the program:
 
-```bash
 python main.py
-```
 
-## Использование
+## Usage
 
-При запуске программы отображается меню с следующими опциями:
+When the program starts, a menu with the following options is displayed:
 
-1. **Добавить книгу** - добавление новой книги в каталог
-2. **Удалить книгу** - удаление книги по ID (только если книга не выдана)
-3. **Добавить пользователя** - регистрация нового пользователя
-4. **Удалить пользователя** - удаление пользователя по ID (только если нет взятых книг)
-5. **Взять книгу** - выдача книги пользователю
-6. **Вернуть книгу** - возврат книги в библиотеку
-7. **Забронировать книгу** - резервирование недоступной книги
-8. **Показать отчёты** - просмотр различных отчётов:
-   - Список всех книг и их статус
-   - Пользователи и их книги
-   - Просроченные книги
-   - Пользователи с наибольшим количеством книг
-9. **Сохранить данные** - сохранение состояния библиотеки в JSON файл
-10. **Загрузить данные** - загрузка данных из JSON файла
-0. **Выход** - завершение работы программы
+1. Add a book - add a new book to the catalog
+2. Delete a book - delete a book by ID (only if the book is not issued)
+3. Add a user - register a new user
+4. Delete user - delete user by ID (only if there are no books taken)
+5. Take a book - giving the book to the user
+6. Return the book - return the book to the library
+7. Book a book - reserve an unavailable book
+8. Show reports - View various reports:
+- List of all books and their status
+   - Users and their books
+   - Expired books
+   - Users with the most books
+9. Save Data - save the library status to a JSON file
+10. Upload Data - download data from a JSON file
+0. Exit - program shutdown
 
-## Сохранение данных
+## Saving data
 
-Данные автоматически сохраняются в файл `library_data.json` при выходе (если пользователь подтвердит). Также можно сохранить данные вручную через меню.
+The data is automatically saved to the library_data file.json` when exiting (if the user confirms). You can also save the data manually via the menu.
 
-Формат JSON файла:
-```json
+JSON file format:
+``json
 {
-  "books": [...],
-  "users": [...],
-  "loans": [...]
+"books": [...],
+"users": [...],
+"loans": [...]
 }
-```
+``
 
-## Особенности реализации
+## Implementation features
 
-- **Объектно-ориентированный подход**: все сущности представлены классами
-- **Чистые функции**: методы классов минимизируют побочные эффекты
-- **Работа с датами**: автоматический расчёт даты возврата и проверка просрочки
-- **Резервации**: система уведомляет о резервациях при возврате книги
-- **Отчёты**: различные виды отчётов для анализа работы библиотеки
+- Object-oriented approach: all entities are represented by classes
+- Pure functions: class methods minimize side effects
+- Working with dates: automatic calculation of the return date and checking the delay
+- Reservations: The system notifies about reservations when the book is returned
+- Reports: various types of reports for analyzing the work of the library
 
-## Требования
+## Requirements
 
 - Python 3.7+
-- Стандартная библиотека Python (json, datetime, typing)
+- Python Standard Library (json, datetime, typing)
 
-## Автор
+## Author
 
-Проект создан в рамках изучения объектно-ориентированного программирования на Python.
+The project was created as part of the study of object-oriented programming in Python.
